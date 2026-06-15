@@ -1,0 +1,10 @@
+# 作業系統
+.DS_Store
+Thumbs.db
+desktop.ini
+# 編輯器
+.vscode/
+.idea/
+*.swp
+# 依賴（暫時冇用，預防）
+node_modules/

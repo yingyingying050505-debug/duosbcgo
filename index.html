@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <meta name="theme-color" content="#0d9488" />
+  <meta name="description" content="每日 3 個英文生字，間距複習，永遠唔會忘記。" />
+
+  <!-- iOS standalone -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="DuoSbcGo" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>DuoSbcGo · 每日英文生字</title>
+</head>
+<body>
+  <div class="app">
+
+    <!-- ============ 主頁 ============ -->
+    <section id="screen-home" class="screen active">
+      <header class="topbar">
+        <div class="brand">📘 DuoSbcGo</div>
+        <div class="topright">
+          <button class="topicon" id="mute-btn" aria-label="靜音開關">🔊</button>
+          <div class="streak" id="home-streak">🔥 0</div>
+        </div>
+      </header>
+
+      <div class="date" id="home-date">今日</div>
+
+      <div class="cards">
+        <button class="bigcard" id="home-btn-learn">
+          <div class="bigcard-top">✨ 今日要學</div>
+          <div class="bigcard-num"><span id="home-new-count">0</span> 個新字</div>
+          <div class="bigcard-sub">睇完即練，親手打出嚟</div>
+        </button>
+
+        <button class="bigcard alt" id="home-btn-review">
+          <div class="bigcard-top">🔁 今日要複習</div>
+          <div class="bigcard-num"><span id="home-due-count">0</span> 個到期</div>
+          <div class="bigcard-sub" id="home-due-sub">間距複習，越記越牢</div>
+        </button>
+      </div>
+
+      <div class="garden-sum" id="home-garden">
+        <div class="gs-head">🌱 我嘅字花園 <small id="gs-count">0/0</small></div>
+        <div class="gs-row" id="gs-row"></div>
+      </div>
+
+      <div class="done-banner" id="home-done" hidden>🎉 今日任務完成！聽日再嚟。</div>
+      <div class="done-banner" id="home-comeback" hidden style="background:var(--teal-soft);color:var(--teal-dark)">🎉 歡迎返嚟！今日輕鬆啲——淨係做複習，唔使學新字。</div>
+
+      <div class="progress-row">
+        <span>已學 <b id="home-learned">0</b> / <span id="home-total">0</span> 個字</span>
+      </div>
+
+      <details class="settings">
+        <summary>⚙️ 設定</summary>
+        <label class="setting-row">
+          每日學幾多個新字：
+          <select id="home-newperday">
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+          </select>
+        </label>
+        <label class="setting-row">
+          停留幾耐可揭曎：
+          <select id="home-reveal">
+            <option value="10">10</option>
+            <option value="15" selected>15</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+          </select> 秒
+        </label>
+        <label class="setting-row">
+          答錯鎖定：
+          <select id="home-lock">
+            <option value="3">3</option>
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+          </select> 秒
+        </label>
+        <label class="setting-row">
+          每日總量上限：
+          <select id="home-cap">
+            <option value="12">12</option>
+            <option value="15" selected>15</option>
+            <option value="18">18</option>
+            <option value="20">20</option>
+          </select>
+        </label>
+        <details class="debug">
+          <summary>🛠 除錯（測試用）</summary>
+          <div class="debug-btns">
+            <button id="dbg-forward">⏩ 快進 1 日</button>
+            <button id="dbg-reset">🗑 重置全部</button>
+          </div>
+          <div class="debug-note">快進日用嚟測試間距排程，唔使真係等幾日。</div>
+        </details>
+      </details>
+    </section>
+
+    <!-- ============ 加入班級 ============ -->
+    <section id="screen-join" class="screen">
+      <div class="join-wrap">
+        <div class="join-emoji">📚</div>
+        <div class="join-title">歡迎嚟到 DuoSbcGo</div>
+        <div class="join-sub">問你老師拎你嘅「專屬碼」，入碼就開到工。</div>
+        <input type="text" id="join-code" placeholder="你的專屬碼" autocomplete="off" />
+        <button class="btn btn-primary" id="join-btn" style="width:100%;margin-top:8px">加入</button>
+        <div class="join-err" id="join-err"></div>
+      </div>
+    </section>
+
+    <!-- ============ 字表準備中（高中未加字） ============ -->
+    <section id="screen-nowords" class="screen">
+      <div class="join-wrap">
+        <div class="join-emoji">📚</div>
+        <div class="join-title">字表準備中</div>
+        <div class="join-sub">你嘅班別（<b id="nowords-class">高中</b>）字表仲未整好。<br>等老師加字之後，重新開呢個 apps 就用得。</div>
+      </div>
+    </section>
+
+    <!-- ============ 學習（睇 + 練） ============ -->
+    <section id="screen-learn" class="screen">
+      <div id="learn-content"></div>
+    </section>
+
+    <!-- ============ 複習（測驗） ============ -->
+    <section id="screen-review" class="screen">
+      <div id="review-content"></div>
+    </section>
+
+    <!-- ============ 字花園 ============ -->
+    <section id="screen-garden" class="screen">
+      <div id="garden-content"></div>
+    </section>
+
+    <!-- ============ 完成總結 ============ -->
+    <section id="screen-done" class="screen">
+      <div id="done-content"></div>
+    </section>
+
+  </div>
+
+  <script src="words.js"></script>
+  <script src="storage.js"></script>
+  <script src="srs.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="sync.js"></script>
+  <script src="feedback.js"></script>
+  <script src="enrichments.js"></script>
+  <script src="words-senior.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

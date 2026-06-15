@@ -1,0 +1,22 @@
+{
+  "name": "DuoSbcGo · 每日英文生字",
+  "short_name": "DuoSbcGo",
+  "description": "每日 3 個英文生字 + 間距複習，離線用到。",
+  "lang": "zh-HK",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f5f9",
+  "theme_color": "#0d9488",
+  "categories": ["education"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
