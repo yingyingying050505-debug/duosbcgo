@@ -199,6 +199,89 @@ function renderGarden() {
   show("screen-garden");
 }
 
+// ---------- 學生月曆 helper ----------
+function scDateStr(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function scMonthCells(y, m) {
+  const first = new Date(y, m, 1); const dim = new Date(y, m + 1, 0).getDate();
+  const lead = (first.getDay() + 6) % 7; const cells = [];
+  for (let i = 0; i < lead; i++) cells.push(null);
+  for (let d = 1; d <= dim; d++) cells.push(scDateStr(new Date(y, m, d)));
+  while (cells.length % 7 !== 0) cells.push(null);
+  return cells;
+}
+
+// ---------- 全班排行榜（按 連續打卡 → 完成日數）----------
+async function showLeaderboard() {
+  const el = document.getElementById("leaderboard-content");
+  el.innerHTML = headHtml("🏆 全班排行榜") + `<div class="hint">載入中…</div>`;
+  show("screen-leaderboard");
+  document.getElementById("step-back").onclick = goHome;
+  if (!window.db || !Sync.classId) {
+    el.innerHTML = headHtml("🏆 全班排行榜") + `<div class="empty"><div class="emoji">📡</div>需要連線顯示排行榜，請接駁網絡再開。</div>`;
+    return;
+  }
+  try {
+    const snap = await window.db.collection("students").where("classId", "==", Sync.classId).get();
+    const rows = [];
+    snap.forEach((d) => {
+      const s = d.data(); let completed = 0;
+      for (const dt in (s.history || {})) if (s.history[dt].completed) completed++;
+      rows.push({ name: s.name || "?", streak: s.streak || 0, completed, me: d.id === Sync.studentId });
+    });
+    rows.sort((a, b) => (b.streak - a.streak) || (b.completed - a.completed));
+    if (!rows.length) {
+      el.innerHTML = headHtml("🏆 全班排行榜") + `<div class="empty"><div class="emoji">👀</div>同班同學仲未有數據。</div>`;
+      return;
+    }
+    const myRank = rows.findIndex((r) => r.me) + 1;
+    let html = rows.slice(0, 5).map((r, i) => lbRow(i + 1, r)).join("");
+    if (myRank > 5) html += `<div class="lb-gap">…</div>` + lbRow(myRank, rows[myRank - 1]);
+    el.innerHTML = headHtml("🏆 全班排行榜") +
+      `<div class="hint">按 🔥連續打卡 → ✅完成日數 排。你排第 <b>${myRank}</b> / ${rows.length}。</div>` +
+      `<div class="lb-list">${html}</div>`;
+  } catch (e) {
+    el.innerHTML = headHtml("🏆 全班排行榜") + `<div class="empty"><div class="emoji">📡</div>讀取失敗，請再試。</div>`;
+  }
+}
+function lbRow(rank, r) {
+  const medal = rank <= 3 ? ["🥇", "🥈", "🥉"][rank - 1] : "#" + rank;
+  return `<div class="lb-row${r.me ? " me" : ""}"><span class="lb-rank">${medal}</span><span class="lb-name">${esc(r.name)}${r.me ? "（你）" : ""}</span><span class="lb-streak">🔥${r.streak}</span><span class="lb-done">✅${r.completed}</span></div>`;
+}
+
+// ---------- 學生自己嘅日曆 ----------
+function showStuCalendar() {
+  const el = document.getElementById("stucal-content");
+  const todayStr = scDateStr(new Date());
+  const st = { y: new Date().getFullYear(), m: new Date().getMonth() };
+  show("screen-stucal");
+  function render() {
+    const cells = scMonthCells(st.y, st.m);
+    let mDone = 0, mPartial = 0;
+    const grid = cells.map((c) => {
+      if (!c) return `<div class="cal-cell blank"></div>`;
+      const h = (state.history || {})[c];
+      let mark = "·", cls = "absent";
+      if (c > todayStr) { mark = ""; cls = "future"; }
+      else if (h) { mark = h.completed ? "✓" : "△"; cls = h.completed ? "done" : "partial"; if (h.completed) mDone++; else mPartial++; }
+      return `<div class="cal-cell ${cls}"><span class="cal-d">${Number(c.slice(8))}</span><span class="cal-m">${mark}</span></div>`;
+    }).join("");
+    const totDone = Object.values(state.history || {}).filter((h) => h.completed).length;
+    el.innerHTML = headHtml("📅 我嘅日曆") +
+      `<div class="cal-nav"><button class="ttiny" data-nav="prev">‹</button><span class="cal-label">${st.y}年 ${st.m + 1}月</span><button class="ttiny" data-nav="next">›</button><button class="ttiny" data-nav="today" style="margin-left:8px">今</button></div>` +
+      `<div class="cal-grid"><div class="cal-hd">一</div><div class="cal-hd">二</div><div class="cal-hd">三</div><div class="cal-hd">四</div><div class="cal-hd">五</div><div class="cal-hd">六</div><div class="cal-hd">日</div>${grid}</div>` +
+      `<div class="cal-stats">本月：完成 ${mDone} 日 · 做過未完 ${mPartial} 日<br>累計完成 ${totDone} 日　·　🔥 ${state.meta.streak || 0}<br><span class="thint">✓ 完成 · △ 做過未完 · · 冇做。每日打卡，唔好斷！</span></div>`;
+    document.getElementById("step-back").onclick = goHome;
+    el.querySelectorAll("[data-nav]").forEach((b) => b.onclick = () => {
+      const d = b.dataset.nav;
+      if (d === "prev") st.m--; if (d === "next") st.m++;
+      if (d === "today") { st.y = new Date().getFullYear(); st.m = new Date().getMonth(); }
+      if (st.m < 0) { st.m = 11; st.y--; } if (st.m > 11) { st.m = 0; st.y++; }
+      render();
+    });
+  }
+  render();
+}
+
 function headHtml(title) {
   return `<div class="screen-head"><button class="back" id="step-back">‹</button><div class="screen-title">${esc(title)}</div></div>`;
 }
@@ -511,6 +594,8 @@ async function init() {
   document.getElementById("home-btn-learn").onclick = startLearn;
   document.getElementById("home-btn-review").onclick = startReview;
   const gardenBtn = document.getElementById("home-garden"); if (gardenBtn) gardenBtn.onclick = renderGarden;
+  const lbBtn = document.getElementById("home-lb"); if (lbBtn) lbBtn.onclick = showLeaderboard;
+  const calBtn = document.getElementById("home-cal"); if (calBtn) calBtn.onclick = showStuCalendar;
   document.getElementById("home-newperday").onchange = (e) => { state.meta.newPerDay = Number(e.target.value); rebuildPlan(); };
   document.getElementById("home-reveal").onchange = (e) => { state.meta.revealSecs = Number(e.target.value); persist(); };
   document.getElementById("home-lock").onchange = (e) => { state.meta.lockSecs = Number(e.target.value); persist(); };

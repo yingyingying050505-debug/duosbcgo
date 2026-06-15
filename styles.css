@@ -257,6 +257,20 @@ html, body {
 .garden-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(34px, 1fr)); gap:4px; margin-top:10px; }
 .gcell { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:18px; background:var(--teal-soft); border-radius:8px; }
 .gcell.empty { background:#f1f5f9; color:var(--line); font-size:14px; }
+/* 主頁 stats 掣 */
+.home-stats { display:flex; gap:8px; margin-top:14px; }
+.stat-btn { flex:1; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; padding:12px; border-radius:12px; border:2px solid var(--line); background:#fff; color:var(--ink); box-shadow:var(--shadow); }
+.stat-btn:active { transform:scale(.98); }
+/* 排行榜 */
+.lb-list { margin-top:6px; }
+.lb-row { display:flex; align-items:center; gap:8px; padding:12px 10px; border-bottom:1px solid var(--line); background:#fff; }
+.lb-row:first-child { border-radius:12px 12px 0 0; }
+.lb-row:last-child { border-radius:0 0 12px 12px; border-bottom:none; }
+.lb-row.me { background:var(--teal-soft); }
+.lb-rank { width:42px; text-align:center; font-weight:800; font-size:16px; }
+.lb-name { flex:1; font-weight:700; }
+.lb-streak, .lb-done { font-size:14px; font-weight:700; min-width:48px; text-align:right; }
+.lb-gap { text-align:center; color:var(--muted); padding:6px; }
 
 /* ============ 加入班級畫面 ============ */
 .join-wrap { max-width: 360px; margin: 40px auto; text-align: center; padding: 0 8px; }
