@@ -112,6 +112,8 @@ html, body {
 }
 .debug { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 10px; }
 .debug-btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.debug-lock { display: flex; gap: 6px; margin-top: 10px; }
+.debug-lock input { flex: 1; font-family: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; }
 .debug-btns button {
   font-family: inherit; font-size: 13px; cursor: pointer;
   background: #f8fafc; border: 1px solid var(--line); color: var(--ink);

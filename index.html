@@ -102,12 +102,16 @@
           </select>
         </label>
         <details class="debug">
-          <summary>🛠 除錯（測試用）</summary>
-          <div class="debug-btns">
+          <summary>🛠 除錯（測試用，需密碼）</summary>
+          <div class="debug-lock">
+            <input type="password" id="dbg-pw" placeholder="密碼" autocomplete="off" />
+            <button class="ttiny" id="dbg-unlock">解鎖</button>
+          </div>
+          <div class="debug-btns" id="dbg-btns" hidden>
             <button id="dbg-forward">⏩ 快進 1 日</button>
             <button id="dbg-reset">🗑 重置全部</button>
           </div>
-          <div class="debug-note">快進日用嚟測試間距排程，唔使真係等幾日。</div>
+          <div class="debug-note">快進日用嚟測試間距排程。密碼問開發者。</div>
         </details>
       </details>
     </section>

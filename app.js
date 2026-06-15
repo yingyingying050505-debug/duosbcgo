@@ -600,6 +600,11 @@ async function init() {
   document.getElementById("home-reveal").onchange = (e) => { state.meta.revealSecs = Number(e.target.value); persist(); };
   document.getElementById("home-lock").onchange = (e) => { state.meta.lockSecs = Number(e.target.value); persist(); };
   document.getElementById("home-cap").onchange = (e) => { state.meta.dailyBudget = Number(e.target.value); rebuildPlan(); };
+  document.getElementById("dbg-unlock").onclick = () => {
+    const inp = document.getElementById("dbg-pw");
+    if (inp.value === "1234") document.getElementById("dbg-btns").hidden = false;
+    else { inp.value = ""; inp.placeholder = "密碼錯"; }
+  };
   document.getElementById("dbg-forward").onclick = () => { state.meta.dayOffset = (state.meta.dayOffset || 0) + 1; refreshToday(); renderHome(); };
   document.getElementById("dbg-reset").onclick = () => {
     if (confirm("確定重置全部進度？所有學習紀錄會冇咗。")) {
