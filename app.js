@@ -605,6 +605,20 @@ async function init() {
     if (inp.value === "1234") document.getElementById("dbg-btns").hidden = false;
     else { inp.value = ""; inp.placeholder = "密碼錯"; }
   };
+  const resyncBtn = document.getElementById("home-resync");
+  if (resyncBtn && window.Sync && Sync.hasIdentity()) resyncBtn.hidden = false;
+  if (resyncBtn) resyncBtn.onclick = () => {
+    if (!confirm("重新由雲端同步？會清除本地暫存（身份同雲端進度唔受影響）。")) return;
+    localStorage.removeItem("duosbc_state_v1");
+    location.reload();
+  };
+  const updateBtn = document.getElementById("home-update");
+  if (updateBtn) updateBtn.onclick = async () => {
+    if (navigator.serviceWorker) {
+      try { const rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map((r) => r.unregister())); } catch (e) {}
+    }
+    location.reload();
+  };
   document.getElementById("dbg-forward").onclick = () => { state.meta.dayOffset = (state.meta.dayOffset || 0) + 1; refreshToday(); renderHome(); };
   document.getElementById("dbg-reset").onclick = () => {
     if (confirm("確定重置全部進度？所有學習紀錄會冇咗。")) {

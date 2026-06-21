@@ -112,6 +112,7 @@ html, body {
 }
 .debug { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 10px; }
 .debug-btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.maint-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 .debug-lock { display: flex; gap: 6px; margin-top: 10px; }
 .debug-lock input { flex: 1; font-family: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; }
 .debug-btns button {
