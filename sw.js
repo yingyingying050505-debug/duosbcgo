@@ -3,7 +3,7 @@
 //  改咗內容之後，bump CACHE 版本號就會強制更新。
 // =============================================================
 
-const CACHE = "duosbc-v14";
+const CACHE = "duosbc-v15";
 const ASSETS = [
   "./",
   "./index.html",

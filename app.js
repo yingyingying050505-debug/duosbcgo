@@ -650,7 +650,10 @@ async function init() {
   } else if (window.Sync && Sync.isOnline()) {
     show("screen-join");
   } else {
-    refreshToday(); renderHome(); show("screen-home");
+    // Firebase load 唔到（極罕見，因為上網站本身就已經有網）→ 顯示需要網絡，唔入冇備份嘅本地模式
+    show("screen-join");
+    const err = document.getElementById("join-err");
+    if (err) err.textContent = "需要網絡連線先可以使用，請接駁網絡後重新開啟。";
   }
 }
 
